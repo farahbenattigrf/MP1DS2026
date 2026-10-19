@@ -3,12 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <title> Oued Ellil </title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
+
 <p>La consommation à Oued Ellil</p>
+
+<input type="file" id="fichierExcel" accept=".xlsx, .xls">
+
+<table border="1" id="tableau"></table>
+
+<script>
+document.getElementById('fichierExcel').addEventListener('change', function(e) {
+    const fichier = e.target.files[0];
+    const lecteur = new FileReader();
+
+    lecteur.onload = function(e) {
+        const donnees = new Uint8Array(e.target.result);
+        const classeur = XLSX.read(donnees, { type: 'array' });
+        const feuille = classeur.Sheets[classeur.SheetNames[0]];
+
+        document.getElementById('tableau').innerHTML =
+            XLSX.utils.sheet_to_html(feuille, { editable: false });
+    };
+
+    lecteur.readAsArrayBuffer(fichier);
+});
+</script>
+
 </body>
 </html>
-<h2>Fichier Excel</h2>
-<a href="Consommation-Oued-Ellil.xlsx" target="_blank">
-    Ouvrir le fichier Excel
-</a>
