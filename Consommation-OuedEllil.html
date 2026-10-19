@@ -1,33 +1,55 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <title> Oued Ellil </title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+</style>
 </head>
 <body>
-
 <p>La consommation à Oued Ellil</p>
 
-<input type="file" id="fichierExcel" accept=".xlsx, .xls">
-
-<table border="1" id="tableau"></table>
+<div id="tableau">Chargement du tableau...</div>
 
 <script>
-document.getElementById('fichierExcel').addEventListener('change', function(e) {
-    const fichier = e.target.files[0];
-    const lecteur = new FileReader();
+fetch("Consommation-Oued-Ellil.xlsx")
+.then(response => {
+    if (!response.ok) {
+        throw new Error("Fichier Excel introuvable.");
+    }
+    return response.arrayBuffer();
+})
+.then(data => {
+    const classeur = XLSX.read(data, { type: "array" });
+    const feuille = classeur.Sheets[classeur.SheetNames[0]];
 
-    lecteur.onload = function(e) {
-        const donnees = new Uint8Array(e.target.result);
-        const classeur = XLSX.read(donnees, { type: 'array' });
-        const feuille = classeur.Sheets[classeur.SheetNames[0]];
-
-        document.getElementById('tableau').innerHTML =
-            XLSX.utils.sheet_to_html(feuille, { editable: false });
-    };
-
-    lecteur.readAsArrayBuffer(fichier);
+    document.getElementById("tableau").innerHTML =
+        XLSX.utils.sheet_to_html(feuille);
+})
+.catch(error => {
+    document.getElementById("tableau").textContent =
+        "Impossible de charger le fichier Excel. Vérifiez son nom et son emplacement.";
+    console.error(error);
 });
 </script>
 
